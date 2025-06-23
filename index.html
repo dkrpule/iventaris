@@ -3,71 +3,81 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Login Inventaris</title>
+  <title>Login Inventaris Kwarran</title>
   <style>
     body {
-      background: #f4f4f4;
-      font-family: sans-serif;
+      font-family: Arial, sans-serif;
+      background: #f0f0f0;
       display: flex;
       justify-content: center;
       align-items: center;
       height: 100vh;
+      margin: 0;
     }
-    .login-box {
-      background: white;
-      padding: 20px 30px;
-      border-radius: 8px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-      width: 300px;
-    }
-    .login-box h2 {
+    .login-container {
+      background: #fff;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+      width: 350px;
       text-align: center;
     }
-    .login-box input {
-      width: 100%;
-      padding: 10px;
-      margin: 8px 0;
-      box-sizing: border-box;
+    .login-container h2 {
+      margin-bottom: 10px;
+      color: #2e7d32;
     }
-    .login-box button {
+    .login-container p {
+      margin-bottom: 20px;
+      color: #555;
+      font-size: 14px;
+    }
+    input[type="text"],
+    input[type="password"] {
       width: 100%;
       padding: 10px;
-      background-color: #4CAF50;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+    }
+    button {
+      width: 100%;
+      padding: 10px;
+      background: #2e7d32;
       border: none;
       color: white;
-      font-weight: bold;
+      border-radius: 6px;
       cursor: pointer;
     }
-    .error {
-      color: red;
-      text-align: center;
+    button:hover {
+      background: #1b5e20;
     }
   </style>
 </head>
 <body>
-  <div class="login-box">
-    <h2>Login</h2>
-    <div id="error" class="error"></div>
-    <input type="text" id="username" placeholder="Username" />
-    <input type="password" id="password" placeholder="Password" />
-    <button onclick="login()">Masuk</button>
+
+  <div class="login-container">
+    <h2>Selamat Datang</h2>
+    <p>di Sistem Aplikasi Update Inventaris Kwarran</p>
+    <form onsubmit="login(event)">
+      <input type="text" id="username" placeholder="Username" required />
+      <input type="password" id="password" placeholder="Password" required />
+      <button type="submit">Login</button>
+    </form>
   </div>
 
   <script>
-    function login() {
-      const username = document.getElementById("username").value;
-      const password = document.getElementById("password").value;
-      const errorDiv = document.getElementById("error");
-
-      // Username dan password statis
-      if (username === "admin" && password === "admin123") {
-        // Simpan status login
-        localStorage.setItem("loggedIn", "true");
-        window.location.href = "dashboard.html";
+    function login(e) {
+      e.preventDefault();
+      const user = document.getElementById("username").value;
+      const pass = document.getElementById("password").value;
+      if (user === "admin" && pass === "123") {
+        alert("Login berhasil!");
+        window.location.href = "inventaris.html"; // halaman utama
       } else {
-        errorDiv.textContent = "Username atau password salah!";
+        alert("Username atau password salah.");
       }
     }
   </script>
+
 </body>
 </html>

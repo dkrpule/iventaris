@@ -3,78 +3,188 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Login Inventaris</title>
+  <title>Dashboard Inventaris</title>
   <style>
     body {
-      background: #f4f4f4;
       font-family: sans-serif;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
+      background: #e0f2f1;
+      padding: 20px;
     }
-    .login-box {
-      background: white;
-      padding: 20px 30px;
-      border-radius: 8px;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-      width: 300px;
-      text-align: center;
-    }
-    .login-box h1 {
-      font-size: 18px;
-      margin-bottom: 20px;
-      color: #333;
-    }
-    .login-box h2 {
+    h1 {
       margin-bottom: 10px;
     }
-    .login-box input {
+    table {
       width: 100%;
-      padding: 10px;
-      margin: 8px 0;
-      box-sizing: border-box;
+      border-collapse: collapse;
+      margin-top: 20px;
+      background: #fff;
     }
-    .login-box button {
-      width: 100%;
+    th, td {
       padding: 10px;
-      background-color: #4CAF50;
-      border: none;
+      border: 1px solid #ccc;
+      text-align: left;
+    }
+    th {
+      background-color: #009688;
       color: white;
-      font-weight: bold;
+    }
+    .logout-btn, .print-btn {
+      padding: 10px 20px;
+      background: #607d8b;
+      color: white;
+      border: none;
+      cursor: pointer;
+      margin-left: 5px;
+    }
+    .logout-btn {
+      background: #d32f2f;
+      float: right;
+    }
+    .form-inputs {
+      margin-top: 20px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .form-inputs input {
+      padding: 8px;
+      flex: 1;
+    }
+    .form-inputs button {
+      padding: 8px 20px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
       cursor: pointer;
     }
-    .error {
-      color: red;
-      text-align: center;
-      font-size: 14px;
-      margin-top: 10px;
+    .action-btn {
+      padding: 5px 10px;
+      margin: 0 2px;
+      cursor: pointer;
+      border: none;
+      color: white;
+    }
+    .delete-btn {
+      background-color: #f44336;
+    }
+
+    @media print {
+      .logout-btn, .form-inputs, .action-btn, .print-btn {
+        display: none !important;
+      }
+      input {
+        border: none;
+        background: none;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="login-box">
-    <h1>Selamat Datang di Sistem Data Inventaris<br>Kwarran Pule</h1>
-    <h2>Login</h2>
-    <div id="error" class="error"></div>
-    <input type="text" id="username" placeholder="Username" />
-    <input type="password" id="password" placeholder="Password" />
-    <button onclick="login()">Masuk</button>
+  <button class="logout-btn" onclick="logout()">Logout</button>
+  <button class="print-btn" onclick="window.print()">🖨️ Cetak</button>
+  <h1>Dashboard Inventaris</h1>
+  <p>Data barang inventaris Kwartir Ranting Pule:</p>
+
+  <div class="form-inputs">
+    <input type="text" id="nama" placeholder="Nama Barang">
+    <input type="text" id="kode" placeholder="Kode Barang">
+    <input type="number" id="jumlah" placeholder="Jumlah">
+    <input type="text" id="lokasi" placeholder="Lokasi">
+    <input type="text" id="kondisi" placeholder="Kondisi">
+    <input type="text" id="asal" placeholder="Asal Barang">
+    <button onclick="tambahBarang()">Tambah</button>
   </div>
 
-  <script>
-    function login() {
-      const username = document.getElementById("username").value;
-      const password = document.getElementById("password").value;
-      const errorDiv = document.getElementById("error");
+  <table>
+    <thead>
+      <tr>
+        <th>No</th>
+        <th>Nama Barang</th>
+        <th>Kode</th>
+        <th>Jumlah</th>
+        <th>Lokasi</th>
+        <th>Kondisi</th>
+        <th>Asal</th>
+        <th>Aksi</th>
+      </tr>
+    </thead>
+    <tbody id="data-barang"></tbody>
+  </table>
 
-      if (username === "admin" && password === "admin123") {
-        localStorage.setItem("loggedIn", "true");
-        window.location.href = "dashboard.html";
-      } else {
-        errorDiv.textContent = "Username atau password salah!";
+  <script>
+    if (localStorage.getItem("loggedIn") !== "true") {
+      window.location.href = "index.html";
+    }
+
+    function logout() {
+      localStorage.removeItem("loggedIn");
+      window.location.href = "index.html";
+    }
+
+    let data = JSON.parse(localStorage.getItem("inventarisData")) || [
+      { nama: "Tenda Dome", kode: "TD-001", jumlah: 10, lokasi: "Gudang A", kondisi: "Baik", asal: "Kwarda" },
+      { nama: "Kompor Lapangan", kode: "KL-002", jumlah: 4, lokasi: "Gudang B", kondisi: "Baik", asal: "Bantuan Dinas" },
+    ];
+
+    function simpanData() {
+      localStorage.setItem("inventarisData", JSON.stringify(data));
+    }
+
+    function tampilkanData() {
+      const tbody = document.getElementById("data-barang");
+      tbody.innerHTML = "";
+      data.forEach((barang, i) => {
+        const row = `<tr>
+          <td>${i + 1}</td>
+          <td><input value="${barang.nama}" onchange="editBarang(${i}, 'nama', this.value)"></td>
+          <td><input value="${barang.kode}" onchange="editBarang(${i}, 'kode', this.value)"></td>
+          <td><input type="number" value="${barang.jumlah}" onchange="editBarang(${i}, 'jumlah', this.value)"></td>
+          <td><input value="${barang.lokasi}" onchange="editBarang(${i}, 'lokasi', this.value)"></td>
+          <td><input value="${barang.kondisi}" onchange="editBarang(${i}, 'kondisi', this.value)"></td>
+          <td><input value="${barang.asal}" onchange="editBarang(${i}, 'asal', this.value)"></td>
+          <td><button class="action-btn delete-btn" onclick="hapusBarang(${i})">Hapus</button></td>
+        </tr>`;
+        tbody.innerHTML += row;
+      });
+    }
+
+    function tambahBarang() {
+      const nama = document.getElementById("nama").value;
+      const kode = document.getElementById("kode").value;
+      const jumlah = document.getElementById("jumlah").value;
+      const lokasi = document.getElementById("lokasi").value;
+      const kondisi = document.getElementById("kondisi").value;
+      const asal = document.getElementById("asal").value;
+
+      if (!nama || !kode || !jumlah || !lokasi || !kondisi || !asal)
+        return alert("Lengkapi semua kolom!");
+
+      data.push({ nama, kode, jumlah, lokasi, kondisi, asal });
+      simpanData();
+      tampilkanData();
+
+      document.getElementById("nama").value = "";
+      document.getElementById("kode").value = "";
+      document.getElementById("jumlah").value = "";
+      document.getElementById("lokasi").value = "";
+      document.getElementById("kondisi").value = "";
+      document.getElementById("asal").value = "";
+    }
+
+    function hapusBarang(index) {
+      if (confirm("Hapus barang ini?")) {
+        data.splice(index, 1);
+        simpanData();
+        tampilkanData();
       }
     }
+
+    function editBarang(index, field, value) {
+      data[index][field] = value;
+      simpanData();
+    }
+
+    tampilkanData();
   </script>
 </body>
 </html>
